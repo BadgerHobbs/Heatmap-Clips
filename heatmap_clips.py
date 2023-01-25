@@ -98,7 +98,7 @@ class VideoHeatmap(pydantic.BaseModel):
                 continue
 
             # Add heatmap if not already exist and so far less than count added
-            if not merged_heatmaps.get(heatmap.chapter.title) and len(merged_heatmaps) < count:
+            if not merged_heatmaps.get(heatmap.chapter.title) and len(merged_heatmaps) <= count:
                 merged_heatmaps[heatmap.chapter.title] = heatmap
 
             else:
@@ -117,7 +117,7 @@ class VideoHeatmap(pydantic.BaseModel):
         return list(merged_heatmaps.values())
 
 
-    def most_intense_chapters(self, merge: bool=True, count: int=3) -> List[Heatmap]:
+    def most_intense_chapters(self, merge: bool=True, count: int=3) -> List[Chapter]:
         """Return the most intense chapters"""
 
         return [heatmap.chapter for heatmap in self.most_intense_heatmaps(merge, count) if heatmap.chapter]
@@ -155,9 +155,9 @@ class Video:
 
     def generate_clip(self, file_name: str, clip_file_name: str, start_time: datetime.time, end_time: datetime.time) -> None:
         """Generate clip using start time and end time, returning file name"""
-
+                
         clip = VideoFileClip(f"tmp/videos/{file_name}").subclip(
-            time_to_seconds(start_time) if time_to_seconds(start_time) <= 0 else 0, 
+            time_to_seconds(start_time) if time_to_seconds(start_time) > 0 else 0, 
             time_to_seconds(end_time) if time_to_seconds(end_time) < self.ydl_info["duration"] else None
         )
         
@@ -277,7 +277,6 @@ async def get_page_content(url: str) -> str:
     html_content = await page.content()
 
     # Close page and browser
-    await page.close()
     await browser.close()
 
     return html_content
@@ -378,7 +377,6 @@ def get_heatmaps(marker_data: dict, chapters: Optional[List[Chapter]]=[]) -> Lis
 def get_video_heatmap(video: Video) -> VideoHeatmap:
     """Get YouTube video heatmap from URL"""
 
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     event_loop = asyncio.get_event_loop()
     html_content = event_loop.run_until_complete(asyncio.gather(get_page_content(video.url)))[0]
     event_loop.close()
@@ -392,24 +390,3 @@ def get_video_heatmap(video: Video) -> VideoHeatmap:
         url=video.url,
         heatmaps=heatmaps,
     )
-
-
-if __name__ == "__main__":
-
-    video_url = input("Enter YouTube Video URL: ")
-    video = Video(url=video_url)
-    video.download()
-    video_heatmap = get_video_heatmap(video)
-
-    video.generate_heatmap_clips(
-        video_heatmap.most_intense_heatmaps(count=3),
-        ClipAlign.center,
-        60,
-    )
-
-    """video.generate_chapter_clips(
-        video_heatmap.most_intense_chapters(False, 3),
-        ClipAlign.center,
-    )"""
-
-    print("Done!")
