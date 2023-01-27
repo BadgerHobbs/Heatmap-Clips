@@ -80,7 +80,7 @@ class VideoHeatmap(pydantic.BaseModel):
     def chapters(self) -> List[Chapter]:
         """Get video chapters from heatmaps"""
 
-        return [heatmap.chapter for heatmap in video_heatmap.heatmaps if heatmap.chapter]
+        return [heatmap.chapter for heatmap in self.heatmaps if heatmap.chapter]
 
     def most_intense_heatmaps(self, merge: bool=True, count: int=3) -> List[Heatmap]:
         """Return the most intense heatmaps, optionally joining by chapter title"""

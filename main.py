@@ -1,6 +1,6 @@
 import typer
 import heatmap_clips
-from typing import Optional, Union
+from typing import Optional
 
 main = typer.Typer()
 
