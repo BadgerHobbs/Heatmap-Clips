@@ -6,6 +6,14 @@ A command-line Python application which extracts, clips, and formats YouTube vid
 - Ytdlp is used to download the YouTube video.
 - MoviePy and FFmpeg is used to clip, crop, blur, and render the vertical video clip.
 
+## Features
+- Automatically download YouTube video from URL, and generate clips.
+- Generate clips based on heatmaps or chapters (if availible).
+- Specify the specific length of clips.
+- Specify the alignment of clips to chapters or heatmaps.
+- Automatically crop image to 1080x1080, with blurred top and bottom margins.
+- Generate any specified number of clips.
+
 ## Example
 *Note: Low framerate due to being a .gif file*
 
